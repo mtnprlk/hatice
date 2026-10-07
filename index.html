@@ -1,0 +1,734 @@
+<!DOCTYPE html>
+<html lang="tr" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İyi Ki Doğdun! | Özel Doğum Günü Kutlaması</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Playfair Display (Elegant Serif) & Plus Jakarta Sans (Modern Sans) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            plum: '#2A0826',
+                            deepPlum: '#1A0418',
+                            burgundy: '#4A0E35',
+                            roseGold: '#E8A598',
+                            champagne: '#F8E2C2',
+                            warmCream: '#FFF8F0',
+                            accentGold: '#D4AF37'
+                        }
+                    },
+                    fontFamily: {
+                        serif: ['"Playfair Display"', 'serif'],
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styling for Glassmorphism and Animations */
+        body {
+            background-color: #1A0418;
+            color: #FFF8F0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism panel */
+        .glass-card {
+            background: rgba(42, 8, 38, 0.45);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(232, 165, 152, 0.2);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card-glow {
+            position: relative;
+        }
+
+        .glass-card-glow::before {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            background: linear-gradient(45deg, rgba(232,165,152,0.5), transparent, rgba(212,175,55,0.4));
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0.6;
+            transition: opacity 0.5s ease;
+        }
+
+        .glass-card-glow:hover::before {
+            opacity: 1;
+        }
+
+        /* Gold Gradient Text */
+        .text-gold-gradient {
+            background: linear-gradient(135deg, #FFF8F0 0%, #F8E2C2 40%, #E8A598 70%, #D4AF37 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .text-rose-gradient {
+            background: linear-gradient(135deg, #FFFFFF 0%, #E8A598 50%, #F8E2C2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Subtle floating animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(0.5deg); }
+        }
+
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Candle Flame Pulse */
+        @keyframes flameGlow {
+            0%, 100% { transform: scale(1); opacity: 0.9; filter: drop-shadow(0 0 10px #D4AF37); }
+            50% { transform: scale(1.15) translateY(-2px); opacity: 1; filter: drop-shadow(0 0 18px #E8A598); }
+        }
+
+        .flame-animation {
+            animation: flameGlow 1.8s ease-in-out infinite;
+            transform-origin: center bottom;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1A0418;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(232, 165, 152, 0.3);
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(232, 165, 152, 0.6);
+        }
+
+        /* Interactive Canvas Position */
+        #fireworksCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .content-layer {
+            position: relative;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="selection:bg-brand-roseGold selection:text-brand-deepPlum">
+
+    <!-- Fireworks Overlay Canvas -->
+    <canvas id="fireworksCanvas"></canvas>
+
+    <!-- Navigation Header -->
+    <header class="fixed top-0 left-0 right-0 z-50 transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#" class="font-serif text-2xl font-bold tracking-wider text-gold-gradient flex items-center gap-2">
+                <i class="fa-solid font-normal text-brand-roseGold text-xl fa-crown"></i>
+                <span id="navBrandName">Hatice</span>
+            </a>
+
+            <!-- Audio Toggle & Navigation Controls -->
+            <div class="flex items-center gap-4">
+                <button id="soundToggleBtn" class="flex items-center gap-2 px-4 py-2 rounded-full glass-card hover:bg-white/10 transition-all duration-300 text-sm font-medium border border-brand-roseGold/30" title="Ses Efektlerini Aç/Kapat">
+                    <i class="fa-solid fa-volume-xmark text-brand-roseGold" id="soundIcon"></i>
+                    <span class="hidden sm:inline" id="soundText">Ses Aç</span>
+                </button>
+                <a href="#wishSection" class="hidden md:inline-flex px-5 py-2 rounded-full bg-gradient-to-r from-brand-roseGold to-brand-accentGold text-brand-deepPlum font-semibold text-sm hover:shadow-lg hover:shadow-brand-roseGold/30 transition-all duration-300 hover:scale-105">
+                    Dilek Bırak
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <div class="content-layer">
+
+        <!-- HERO SECTION -->
+        <section class="min-h-screen flex items-center justify-center px-4 pt-24 pb-12 relative">
+            <div class="max-w-4xl mx-auto text-center">
+
+                <!-- Floating Celebration Badge -->
+                <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card mb-8 border border-brand-roseGold/40 animate-float">
+                    <span class="inline-block w-2 h-2 rounded-full bg-brand-roseGold animate-ping"></span>
+                    <span class="text-xs uppercase tracking-widest text-brand-champagne font-semibold">Mutlu Yıllar • Nice Yaşlara</span>
+                </div>
+
+                <!-- Main Celebration Card -->
+                <div class="glass-card glass-card-glow rounded-3xl p-8 sm:p-14 relative overflow-hidden my-4">
+                    <!-- Subtle Corner Accents -->
+                    <div class="absolute -top-12 -left-12 w-32 h-32 bg-brand-roseGold/20 rounded-full blur-2xl pointer-events-none"></div>
+                    <div class="absolute -bottom-12 -right-12 w-32 h-32 bg-brand-accentGold/20 rounded-full blur-2xl pointer-events-none"></div>
+
+                    <!-- Candle / Cake Visual Icon -->
+                    <div class="mb-6 flex justify-center">
+                        <div class="relative w-16 h-16 flex items-center justify-center">
+                            <i class="fa-solid fa-cake-candles text-5xl text-brand-roseGold"></i>
+                            <div class="absolute top-0 text-brand-champagne text-xs flame-animation">
+                                <i class="fa-solid fa-sparkles"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Name and Title -->
+                    <h1 class="font-serif text-5xl sm:text-7xl lg:text-8xl font-bold tracking-tight text-gold-gradient mb-4">
+                        İyi Ki Doğdun, <br class="hidden sm:inline"/>
+                        <span id="heroName" class="underline decoration-brand-roseGold/40 decoration-wavy decoration-1">Hatice</span>!
+                    </h1>
+
+                    <p class="text-lg sm:text-2xl font-light text-brand-warmCream/90 max-w-2xl mx-auto mb-8 font-serif italic">
+                        "<span id="heroQuote">Yeni yaşında tüm güzellikler, mucizeler ve sonsuz mutluluklar seninle olsun. Hayatın tıpkı bu gece gibi ışıl ışıl geçsin!</span>"
+                    </p>
+
+                    <!-- Interactive Quick Action Buttons -->
+                    <div class="flex flex-wrap justify-center gap-4 text-sm font-medium">
+                        <button id="triggerFireworksBtn" class="px-8 py-3.5 rounded-full bg-gradient-to-r from-brand-roseGold via-brand-champagne to-brand-accentGold text-brand-deepPlum font-bold shadow-xl shadow-brand-roseGold/20 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center gap-2">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                            Havai Fişek Patlat!
+                        </button>
+                        <a href="#gallerySection" class="px-8 py-3.5 rounded-full glass-card text-brand-warmCream hover:bg-white/10 transition-all duration-300 border border-brand-roseGold/30 flex items-center gap-2">
+                            <i class="fa-regular fa-images"></i>
+                            Anılara Göz At
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- COUNTDOWN TIMER SECTION -->
+        <section class="py-16 px-4">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="font-serif text-2xl sm:text-3xl font-semibold text-rose-gradient mb-2" id="timerTitle">Yeni Yaş Kutlama Sayacı</h2>
+                <p class="text-xs sm:text-sm text-brand-champagne/70 mb-8" id="timerSubtitle">12 Ekim 2026'ya kalan süre</p>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                    <div class="glass-card rounded-2xl p-6 text-center border border-brand-roseGold/20">
+                        <span class="block font-serif text-4xl sm:text-5xl font-bold text-gold-gradient mb-1" id="timerDays">00</span>
+                        <span class="text-xs uppercase tracking-wider text-brand-roseGold/80 font-medium">Gün</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 text-center border border-brand-roseGold/20">
+                        <span class="block font-serif text-4xl sm:text-5xl font-bold text-gold-gradient mb-1" id="timerHours">00</span>
+                        <span class="text-xs uppercase tracking-wider text-brand-roseGold/80 font-medium">Saat</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 text-center border border-brand-roseGold/20">
+                        <span class="block font-serif text-4xl sm:text-5xl font-bold text-gold-gradient mb-1" id="timerMinutes">00</span>
+                        <span class="text-xs uppercase tracking-wider text-brand-roseGold/80 font-medium">Dakika</span>
+                    </div>
+                    <div class="glass-card rounded-2xl p-6 text-center border border-brand-roseGold/20">
+                        <span class="block font-serif text-4xl sm:text-5xl font-bold text-gold-gradient mb-1" id="timerSeconds">00</span>
+                        <span class="text-xs uppercase tracking-wider text-brand-roseGold/80 font-medium">Saniye</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PHOTO GALLERY GRID -->
+        <section id="gallerySection" class="py-20 px-4 max-w-6xl mx-auto">
+            <div class="text-center mb-14">
+                <h2 class="font-serif text-3xl sm:text-5xl font-bold text-gold-gradient mb-4">Unutulmaz Anılar</h2>
+                <p class="text-brand-champagne/80 text-sm sm:text-base max-w-xl mx-auto">Kahkahalar, güzel anlar ve birlikte biriktirilen eşsiz hatıralar.</p>
+            </div>
+
+            <!-- Gallery Grid with Glow Hover -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Gallery Item 1 -->
+                <div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-brand-roseGold/20">
+                    <div class="relative aspect-square overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1513151233558-d860c5398176?q=80&w=800&auto=format&fit=crop" alt="Doğum Günü Kutlaması" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-brand-deepPlum via-transparent to-transparent opacity-60"></div>
+                        <div class="absolute bottom-4 left-4 right-4 text-left">
+                            <span class="text-xs text-brand-roseGold uppercase font-semibold tracking-widest">Işıltılı Anlar</span>
+                            <h3 class="font-serif text-lg font-medium text-brand-warmCream">Birlikte Kutlanan Gülüşler</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 2 -->
+                <div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-brand-roseGold/20">
+                    <div class="relative aspect-square overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?q=80&w=800&auto=format&fit=crop" alt="Balonlar ve Parti" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-brand-deepPlum via-transparent to-transparent opacity-60"></div>
+                        <div class="absolute bottom-4 left-4 right-4 text-left">
+                            <span class="text-xs text-brand-roseGold uppercase font-semibold tracking-widest">Neşe & Coşku</span>
+                            <h3 class="font-serif text-lg font-medium text-brand-warmCream">Rengarenk Dilekler</h3>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gallery Item 3 -->
+                <div class="glass-card rounded-2xl overflow-hidden group hover:-translate-y-2 transition-all duration-500 border border-brand-roseGold/20">
+                    <div class="relative aspect-square overflow-hidden">
+                        <img src="https://images.unsplash.com/photo-1464349095431-e9a21285b5f3?q=80&w=800&auto=format&fit=crop" alt="Doğum Günü Pastası" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                        <div class="absolute inset-0 bg-gradient-to-t from-brand-deepPlum via-transparent to-transparent opacity-60"></div>
+                        <div class="absolute bottom-4 left-4 right-4 text-left">
+                            <span class="text-xs text-brand-roseGold uppercase font-semibold tracking-widest">En Tatlı An</span>
+                            <h3 class="font-serif text-lg font-medium text-brand-warmCream">Yeni Yaşın İlk Mumu</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- WISHES & RSVP FORM SECTION -->
+        <section id="wishSection" class="py-20 px-4">
+            <div class="max-w-3xl mx-auto">
+                <div class="glass-card glass-card-glow rounded-3xl p-8 sm:p-12 border border-brand-roseGold/30">
+                    <div class="text-center mb-10">
+                        <i class="fa-regular fa-envelope-open text-4xl text-brand-roseGold mb-3"></i>
+                        <h2 class="font-serif text-3xl sm:text-4xl font-bold text-gold-gradient mb-2">İyi Dileklerini Paylaş</h2>
+                        <p class="text-sm text-brand-champagne/80">Hatice için bir doğum günü mesajı veya dilek bırakın!</p>
+                    </div>
+
+                    <!-- Interactive Form -->
+                    <form id="wishForm" class="space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-brand-roseGold mb-2 font-medium">Adınız Soyadınız</label>
+                                <input type="text" name="name" required maxlength="60" placeholder="Ad Soyad" class="w-full px-4 py-3 rounded-xl bg-brand-deepPlum/60 border border-brand-roseGold/30 text-brand-warmCream placeholder-brand-champagne/30 focus:outline-none focus:border-brand-roseGold transition-colors">
+                            </div>
+                            <div>
+                                <label class="block text-xs uppercase tracking-wider text-brand-roseGold mb-2 font-medium">Yakınlığınız / Mesaj Tipi</label>
+                                <select name="relation" class="w-full px-4 py-3 rounded-xl bg-brand-deepPlum/60 border border-brand-roseGold/30 text-brand-warmCream focus:outline-none focus:border-brand-roseGold transition-colors">
+                                    <option value="friend" class="bg-brand-deepPlum">Yakın Arkadaş</option>
+                                    <option value="family" class="bg-brand-deepPlum">Aile</option>
+                                    <option value="colleague" class="bg-brand-deepPlum">İş Arkadaşı</option>
+                                    <option value="other" class="bg-brand-deepPlum">Diğer</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase tracking-wider text-brand-roseGold mb-2 font-medium">Doğum Günü Mesajınız</label>
+                            <textarea name="message" rows="4" required maxlength="500" placeholder="Yeni yaşının sana mutluluk, başarı ve sağlık getirmesini dilerim..." class="w-full px-4 py-3 rounded-xl bg-brand-deepPlum/60 border border-brand-roseGold/30 text-brand-warmCream placeholder-brand-champagne/30 focus:outline-none focus:border-brand-roseGold transition-colors resize-none"></textarea>
+                        </div>
+
+                        <!-- Bot tuzağı: gerçek ziyaretçi görmez, dolduran gönderim yok sayılır -->
+                        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden">
+
+                        <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-brand-roseGold via-brand-champagne to-brand-accentGold text-brand-deepPlum font-bold text-base shadow-xl hover:opacity-95 active:scale-[0.99] transition-all duration-300">
+                            <i class="fa-solid fa-paper-plane mr-2"></i> Dileğini Gönder ve Kutlamaya Katıl
+                        </button>
+                    </form>
+
+                    <!-- Wishes Display Area -->
+                    <div class="mt-12 pt-8 border-t border-brand-roseGold/20">
+                        <h3 class="font-serif text-xl font-semibold text-brand-champagne mb-6 flex items-center gap-2">
+                            <i class="fa-solid fa-comments text-brand-roseGold text-sm"></i> Gönderilen Dilekler
+                        </h3>
+                        <p id="wishesStatus" class="text-sm text-brand-champagne/60 italic mb-4">Dilekler yükleniyor…</p>
+                        <div id="wishesList" class="space-y-4 max-h-80 overflow-y-auto pr-2"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="py-10 text-center border-t border-brand-roseGold/10 text-xs text-brand-champagne/50">
+            <p class="mb-2">Sevgi ve Işıltıyla Tasarlandı ✨</p>
+            <p>© <span id="currentYear"></span> Özel Doğum Günü Web Şablonu</p>
+        </footer>
+    </div>
+
+    <script>
+        // Set Current Year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        /* ==========================================================================
+           1. AUDIO SYNTHESIS ENGINE (Web Audio API for sound FX)
+           ========================================================================== */
+        let audioCtx = null;
+        let isSoundEnabled = false;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playFireworkSound() {
+            if (!isSoundEnabled || !audioCtx) return;
+
+            // Synthesis for Firework Pop/Burst
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            // Frequency sweep for explosion feel
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(150 + Math.random() * 100, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(30, audioCtx.currentTime + 0.3);
+
+            gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.3);
+        }
+
+        function playChimeSound() {
+            if (!isSoundEnabled || !audioCtx) return;
+
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+            osc.frequency.exponentialRampToValueAtTime(659.25, audioCtx.currentTime + 0.2); // E5
+
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // Sound Toggle Listener
+        const soundToggleBtn = document.getElementById('soundToggleBtn');
+        const soundIcon = document.getElementById('soundIcon');
+        const soundText = document.getElementById('soundText');
+
+        soundToggleBtn.addEventListener('click', () => {
+            initAudio();
+            isSoundEnabled = !isSoundEnabled;
+            if (isSoundEnabled) {
+                soundIcon.className = 'fa-solid fa-volume-high text-brand-roseGold';
+                soundText.textContent = 'Ses Açık';
+                playChimeSound();
+            } else {
+                soundIcon.className = 'fa-solid fa-volume-xmark text-brand-roseGold';
+                soundText.textContent = 'Ses Kapalı';
+            }
+        });
+
+        /* ==========================================================================
+           2. FIREWORKS CANVAS ENGINE
+           ========================================================================== */
+        const canvas = document.getElementById('fireworksCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+
+        class Particle {
+            constructor(x, y, color, velocityX, velocityY) {
+                this.x = x;
+                this.y = y;
+                this.color = color;
+                this.vx = velocityX;
+                this.vy = velocityY;
+                this.alpha = 1;
+                this.friction = 0.96;
+                this.gravity = 0.04;
+                this.decay = Math.random() * 0.015 + 0.01;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.vx *= this.friction;
+                this.vy *= this.friction;
+                this.vy += this.gravity;
+                this.x += this.vx;
+                this.y += this.vy;
+                this.alpha -= this.decay;
+            }
+        }
+
+        class Firework {
+            constructor(startX, startY, targetX, targetY) {
+                this.x = startX;
+                this.y = startY;
+                this.targetX = targetX;
+                this.targetY = targetY;
+                this.distanceToTarget = Math.hypot(targetX - startX, targetY - startY);
+                this.distanceTraveled = 0;
+                this.angle = Math.atan2(targetY - startY, targetX - startX);
+                this.speed = 3;
+                this.acceleration = 1.05;
+                this.brightness = Math.random() * 50 + 50;
+                this.particles = [];
+                this.exploded = false;
+
+                // Color Palette: Gold, Champagne, Rose Gold, Warm Coral
+                const colors = ['#E8A598', '#F8E2C2', '#D4AF37', '#FF6B6B', '#FFFFFF'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                if (!this.exploded) {
+                    this.speed *= this.acceleration;
+                    const vx = Math.cos(this.angle) * this.speed;
+                    const vy = Math.sin(this.angle) * this.speed;
+                    this.distanceTraveled = Math.hypot(this.x - (this.x + vx), this.y - (this.y + vy));
+
+                    if (this.y <= this.targetY) {
+                        this.explode();
+                    } else {
+                        this.x += vx;
+                        this.y += vy;
+                    }
+                }
+
+                for (let i = this.particles.length - 1; i >= 0; i--) {
+                    this.particles[i].update();
+                    if (this.particles[i].alpha <= 0) {
+                        this.particles.splice(i, 1);
+                    }
+                }
+            }
+
+            explode() {
+                this.exploded = true;
+                playFireworkSound();
+                const particleCount = 60 + Math.floor(Math.random() * 40);
+                for (let i = 0; i < particleCount; i++) {
+                    const angle = (Math.PI * 2 / particleCount) * i;
+                    const speed = Math.random() * 6 + 1;
+                    const vx = Math.cos(angle) * speed;
+                    const vy = Math.sin(angle) * speed;
+                    this.particles.push(new Particle(this.x, this.y, this.color, vx, vy));
+                }
+            }
+
+            draw() {
+                if (!this.exploded) {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, 3, 0, Math.PI * 2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+
+                for (const particle of this.particles) {
+                    particle.draw();
+                }
+            }
+        }
+
+        let fireworks = [];
+
+        function animateFireworks() {
+            // Semi-transparent background for glowing trail effect
+            ctx.fillStyle = 'rgba(26, 4, 24, 0.2)';
+            ctx.fillRect(0, 0, width, height);
+
+            // Randomly launch ambient fireworks
+            if (Math.random() < 0.035) {
+                const startX = width * 0.1 + Math.random() * (width * 0.8);
+                const targetX = startX + (Math.random() * 100 - 50);
+                const targetY = height * 0.15 + Math.random() * (height * 0.35);
+                fireworks.push(new Firework(startX, height, targetX, targetY));
+            }
+
+            for (let i = fireworks.length - 1; i >= 0; i--) {
+                fireworks[i].update();
+                fireworks[i].draw();
+                if (fireworks[i].exploded && fireworks[i].particles.length === 0) {
+                    fireworks.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animateFireworks);
+        }
+
+        // Trigger manual burst
+        function triggerBurst() {
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => {
+                    const startX = width * 0.2 + Math.random() * (width * 0.6);
+                    const targetX = startX + (Math.random() * 120 - 60);
+                    const targetY = height * 0.1 + Math.random() * (height * 0.3);
+                    fireworks.push(new Firework(startX, height, targetX, targetY));
+                }, i * 180);
+            }
+        }
+
+        document.getElementById('triggerFireworksBtn').addEventListener('click', triggerBurst);
+
+        // Start animation after window load
+        window.onload = function() {
+            animateFireworks();
+        };
+
+        /* ==========================================================================
+           3. COUNTDOWN TIMER (12 Ekim 2026, 00:00 yerel saat)
+           ========================================================================== */
+        const TARGET = new Date(2026, 9, 12, 0, 0, 0).getTime();
+        let timerDone = false;
+
+        function updateTimer() {
+            const diff = Math.max(0, TARGET - Date.now());
+            const totalSeconds = Math.floor(diff / 1000);
+            const days = Math.floor(totalSeconds / 86400);
+            const hours = Math.floor(totalSeconds % 86400 / 3600);
+            const minutes = Math.floor(totalSeconds % 3600 / 60);
+            const seconds = totalSeconds % 60;
+
+            document.getElementById('timerDays').textContent = String(days).padStart(2, '0');
+            document.getElementById('timerHours').textContent = String(hours).padStart(2, '0');
+            document.getElementById('timerMinutes').textContent = String(minutes).padStart(2, '0');
+            document.getElementById('timerSeconds').textContent = String(seconds).padStart(2, '0');
+
+            if (diff === 0 && !timerDone) {
+                timerDone = true;
+                document.getElementById('timerTitle').textContent = 'Bugün Senin Günün!';
+                document.getElementById('timerSubtitle').textContent = 'İyi ki doğdun Hatice 🎉';
+                triggerBurst();
+            }
+        }
+
+        setInterval(updateTimer, 1000);
+        updateTimer();
+
+        /* ==========================================================================
+           4. WISHES — Google E-Tablo + Apps Script (bkz. dilekler-apps-script.gs)
+           ========================================================================== */
+        // Apps Script web uygulamasının ".../exec" ile biten URL'si
+        const WISHES_API = 'https://script.google.com/macros/s/AKfycbwyzTbnD-R5IgQ8Uw4ltQbPC4U0ojLkptkQmh66iytFeE_4W_5Wi2vN24fT02Rs2P17/exec';
+
+        const wishForm = document.getElementById('wishForm');
+        const wishesList = document.getElementById('wishesList');
+        const wishesStatus = document.getElementById('wishesStatus');
+
+        function setWishesStatus(text) {
+            wishesStatus.textContent = text;
+            wishesStatus.classList.toggle('hidden', !text);
+        }
+
+        function formatWishDate(iso) {
+            const date = new Date(iso);
+            return isNaN(date) ? '' : date.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long' });
+        }
+
+        // Ziyaretçi girdisi yalnızca textContent ile basılır (HTML olarak yorumlanmaz)
+        function createWishEl(wish, pending) {
+            const el = document.createElement('div');
+            el.className = 'p-4 rounded-xl bg-brand-deepPlum/40 border border-brand-roseGold/10 text-sm';
+
+            const head = document.createElement('div');
+            head.className = 'flex justify-between items-center gap-3 mb-1';
+            const name = document.createElement('span');
+            name.className = 'font-semibold text-brand-roseGold';
+            name.textContent = wish.name;
+            const meta = document.createElement('span');
+            meta.className = 'text-xs text-brand-champagne/40 shrink-0';
+            meta.textContent = pending ? 'Onay bekliyor' : [wish.relation, formatWishDate(wish.date)].filter(Boolean).join(' · ');
+            head.append(name, meta);
+
+            const message = document.createElement('p');
+            message.className = 'text-brand-warmCream/80 font-serif italic whitespace-pre-line break-words';
+            message.textContent = `"${wish.message}"`;
+
+            el.append(head, message);
+            return el;
+        }
+
+        async function loadWishes() {
+            if (!WISHES_API) {
+                setWishesStatus('Dilek servisi henüz bağlanmadı.');
+                return;
+            }
+            try {
+                const res = await fetch(WISHES_API);
+                const data = await res.json();
+                if (!data.ok) throw new Error(data.error);
+                wishesList.replaceChildren(...data.wishes.map(wish => createWishEl(wish, false)));
+                setWishesStatus(data.wishes.length ? '' : 'Henüz dilek yok. İlk dileği sen bırak!');
+            } catch (err) {
+                setWishesStatus('Dilekler şu an yüklenemedi.');
+            }
+        }
+
+        wishForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const fd = new FormData(wishForm);
+            const wish = {
+                name: fd.get('name').trim(),
+                relation: fd.get('relation'),
+                message: fd.get('message').trim(),
+                website: fd.get('website')
+            };
+            if (!wish.name || !wish.message) return;
+
+            const submitBtn = wishForm.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i> Gönderiliyor…';
+
+            let ok = false;
+            try {
+                if (!WISHES_API) throw new Error('WISHES_API boş');
+                // text/plain: Apps Script CORS ön-isteğini (preflight) desteklemediği için
+                const res = await fetch(WISHES_API, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(wish)
+                });
+                ok = (await res.json()).ok === true;
+            } catch (err) {
+                ok = false;
+            }
+
+            if (ok) {
+                wishesList.prepend(createWishEl(wish, true));
+                setWishesStatus('');
+                wishForm.reset();
+                triggerBurst();
+                submitBtn.innerHTML = '<i class="fa-solid fa-circle-check text-green-700 mr-2"></i> Dileğin alındı! Onaylanınca burada görünecek.';
+            } else {
+                submitBtn.innerHTML = '<i class="fa-solid fa-triangle-exclamation mr-2"></i> Gönderilemedi, lütfen tekrar dene.';
+            }
+
+            setTimeout(() => {
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+            }, 3500);
+        });
+
+        loadWishes();
+    </script>
+</body>
+</html>
